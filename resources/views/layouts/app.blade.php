@@ -31,7 +31,7 @@
     <!-- ═══════ SIDEBAR (RTL → fixed to the RIGHT) ═══════ -->
     <aside id="sidebar"
            class="fixed top-0 right-0 bottom-0 w-64 bg-slate-900 z-40 flex flex-col
-                  transition-transform duration-300 lg:translate-x-0">
+                  transition-transform duration-300 translate-x-full lg:translate-x-0">
 
         <!-- Logo -->
         <div class="flex items-center gap-3 px-5 py-5 border-b border-slate-700/50 flex-shrink-0">
@@ -135,8 +135,8 @@
         </div>
     </aside>
 
-    <!-- ═══════ MAIN AREA (offset right by sidebar width) ═══════ -->
-    <div class="mr-64 min-h-screen flex flex-col">
+    <!-- ═══════ MAIN AREA (offset right by sidebar width on desktop) ═══════ -->
+    <div class="mr-0 lg:mr-64 min-h-screen flex flex-col pb-16 lg:pb-0">
 
         <!-- Top Navbar -->
         <header class="bg-white border-b border-slate-200 sticky top-0 z-30 h-16 flex items-center justify-between px-6">
@@ -173,7 +173,7 @@
 
                     <!-- Dropdown panel (fixed so it escapes header stacking context) -->
                     <div id="notifPanel"
-                         class="hidden fixed top-16 left-4 w-96 bg-white rounded-2xl shadow-2xl border border-slate-100 z-[200] overflow-hidden">
+                         class="hidden fixed top-16 left-2 right-2 sm:left-4 sm:right-auto sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-100 z-[200] overflow-hidden">
                         <!-- Header -->
                         <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
                             <div class="flex items-center gap-2">
@@ -280,10 +280,46 @@
         </header>
 
         <!-- Page Content -->
-        <main class="flex-1 p-6">
+        <main class="flex-1 p-3 sm:p-6">
             @yield('content')
         </main>
     </div>
+
+    <!-- ═══════ MOBILE BOTTOM NAV (hidden on desktop) ═══════ -->
+    <nav class="fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 z-50 flex lg:hidden">
+        @php
+        $bottomLinks = [
+            ['href'=>'/dashboard',      'label'=>'الرئيسية',  'match'=>'dashboard',       'icon'=>'home'],
+            ['href'=>'/cases',          'label'=>'القضايا',   'match'=>'cases*',           'icon'=>'briefcase'],
+            ['href'=>'/tasks',          'label'=>'المهام',    'match'=>'tasks*',           'icon'=>'check'],
+            ['href'=>'/court-sessions', 'label'=>'الجلسات',  'match'=>'court-sessions*',  'icon'=>'calendar'],
+            ['href'=>'/clients',        'label'=>'العملاء',   'match'=>'clients*',         'icon'=>'user'],
+        ];
+        @endphp
+        @foreach($bottomLinks as $bl)
+            @php $ba = request()->is($bl['match']); @endphp
+            <a href="{{ $bl['href'] }}" class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 transition-colors {{ $ba ? 'text-slate-800' : 'text-slate-400' }}">
+                @if($bl['icon']==='home')
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                @elseif($bl['icon']==='briefcase')
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                @elseif($bl['icon']==='check')
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                @elseif($bl['icon']==='calendar')
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                @elseif($bl['icon']==='user')
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                @endif
+                <span class="text-[10px] font-medium leading-none">{{ $bl['label'] }}</span>
+                @if($ba)<span class="w-1 h-1 rounded-full bg-slate-800 mt-0.5"></span>@endif
+            </a>
+        @endforeach
+        <!-- More button → opens sidebar -->
+        <button onclick="toggleSidebar()" class="flex-1 flex flex-col items-center justify-center gap-0.5 py-2 text-slate-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7"/></svg>
+            <span class="text-[10px] font-medium leading-none">المزيد</span>
+        </button>
+    </nav>
 
     <!-- ═══════ GLOBAL JS ═══════ -->
     <script>
@@ -298,8 +334,9 @@
         function toggleSidebar() {
             const s = document.getElementById('sidebar');
             const o = document.getElementById('sidebarOverlay');
-            s.classList.toggle('translate-x-full');
-            o.classList.toggle('hidden');
+            const isHidden = s.classList.contains('translate-x-full');
+            s.classList.toggle('translate-x-full', !isHidden);
+            o.classList.toggle('hidden', !isHidden);
         }
         function closeSidebar() {
             document.getElementById('sidebar').classList.add('translate-x-full');

@@ -21,7 +21,7 @@
     }
     </style>
 </head>
-<body class="antialiased min-h-screen flex" style="font-family:'Noto Kufi Arabic',sans-serif;">
+<body class="antialiased min-h-screen flex flex-col lg:flex-row" style="font-family:'Noto Kufi Arabic',sans-serif;">
 
     <!-- Right Panel — Branding -->
     <div class="hidden lg:flex lg:w-1/2 bg-slate-900 flex-col justify-between p-12 relative overflow-hidden">
